@@ -70,7 +70,7 @@
         return;
       }
       subject = '403 Unauthorized';
-      text = 'An unauthorized response was returned. Most likely this means that the storage account credentials are incorrect or that the storage credentials have not been provided to the server application (either through the request or via environment variables).';
+      text = '<p>An unauthorized response was returned. Most likely this means:</p><ul><li>The storage account credentials are incorrect</li><li>No credentials have been provided</li></ul><p><small>Also: you can configure environment variables on the cloud side to automatically authenticate the table explorer.</small></p>';
     } else {
       text = request.statusText || request.responseText;
     }
