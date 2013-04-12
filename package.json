@@ -1,0 +1,12 @@
+{
+  "name": "azure-table-explorer",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "3.1.1",
+    "azure": "*"
+  }
+}
