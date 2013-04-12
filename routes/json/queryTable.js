@@ -19,7 +19,7 @@ var   send = require('./send')
     , TableQuery = azure.TableQuery;
 
 module.exports = function queryTable (req, res, next) {
-	var top = req.query.top || 15;
+	var top = req.query.top || 12;
 
 	var query = TableQuery
     		.select()
