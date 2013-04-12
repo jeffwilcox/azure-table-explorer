@@ -189,16 +189,25 @@
 
       // Pagination
       var hasContinuation = table.continuation.nextRowKey && table.continuation.nextPartitionKey;
+
+      pagingKeys[page] = table.continuation;
+
       var ip = +page; // ensure it is a number
 
       html.push('<div class="pagination"><ul>');
+
+      var buttons = {};
 
       // Previous
       html.push('<li');
       if (ip <= 1) {
         html.push(' class="disabled"');
       }      
-      html.push('><a href="#">Prev</a></li>');
+      html.push('><a class="pageto');
+      var n = ip - 1;
+      buttons[n] = true;
+      html.push('' + n);
+      html.push('" href="#">&laquo;</a></li>');
 
       // Numbers
       var start = ip > 5 ? ip - 5 : 1;
@@ -209,9 +218,13 @@
         if (i == ip) {
           html.push(' class="active"');
         }
-        html.push('><a href="#">');
+        html.push('><a class="pageto');
+        html.push('' + i);
+        html.push('" href="#">');
         html.push('' + i);
         html.push('</a></li>');
+
+        buttons[i] = true;
       }
 
       // Next
@@ -219,12 +232,36 @@
       if (!hasContinuation) {
         html.push(' class="disabled"');
       }
-      html.push('><a href="#">Next</a></li>');
+      html.push('><a class="pageto');
+      html.push('' + (end-1));
+      html.push('" href="#">&raquo;</a></li>');
 
       html.push('</ul></div>');
 
       // to string
       $('#results').html(html.join(''));
+
+      for (var alink in buttons) {
+        if (buttons[alink] === true) {
+          (function(alink) {
+            $('.pageto' + alink).click(function(){
+              var asNumber = +alink;
+              if (asNumber > 0) {
+                var c = asNumber > 1 ? pagingKeys[asNumber - 1] : 0;
+                var cc = c.nextRowKey && c.nextPartitionKey ? c : undefined;
+                if (asNumber == 1 || c) {
+                  loadTable(tableName, asNumber, c);
+                } else {
+                  showError('No partition/row paging info', 
+                    'The required nextRowKey and nextPartitionKey data is not currently available to enable this paging operation.');
+                }
+              }
+              return false;
+            });
+          })(alink);
+        }
+      }
+
 
     } else {
       $('#results').html('There are no rows in the table.');
@@ -233,13 +270,19 @@
     // alert(JSON.stringify(table));
   }
 
-  function loadTable(tableName) {
+  function loadTable(tableName, page, continuation) {
+    var data = getAjaxCredentials() || {};
+    if (continuation) {
+      data.nextRowKey = continuation.nextRowKey;
+      data.nextPartitionKey = continuation.nextPartitionKey;
+    }
+
   	$.ajax({
   		url: "/json/table/" + tableName,
-      data: getAjaxCredentials(),
+      data: data,
   		success: function (data) {
         showErrorElse(data, function () {
-          loadTableData(tableName, data.table);
+          loadTableData(tableName, data.table, page);
         });
   		}
   	});
