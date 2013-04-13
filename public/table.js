@@ -92,6 +92,7 @@
   function sendRowDelete(tableName, partitionKey, rowKey, callback) {
     callback = callback || emptyCallback;
     var data = getAjaxCredentials() || {};
+    alert(JSON.stringify(data));
     $.ajax({
       type: 'DELETE',
       url: "/json/table/" + tableName + "/" + partitionKey + "/" + rowKey,
