@@ -14,18 +14,21 @@
 // limitations under the License.
 //
 
-var   express = require('express')
-    , app = module.exports = express()
-    , azure = require('azure')
+var   send = require('./send');
 
-    , queryTables = require('./json/queryTables')
-    , queryTable = require('./json/queryTable')
-    , deleteRow = require('./json/deleteRow')
+module.exports = function deleteRow (req, res, next) {
+	var rowKey = req.params.rowKey;
+	var partitionKey = req.params.partitionKey;
+	var tableName = req.params.tableName;
 
-    , tableServiceMiddleware = require('./json/tableServiceMiddleware');
+	var entityDescriptor = {
+		PartitionKey: partitionKey,
+		RowKey: rowKey
+	};
 
-app.use(tableServiceMiddleware);
-
-app.get('/table', queryTables);
-app.get('/table/:tableName', queryTable);
-app.delete('/table/:tableName/:partitionKey/:rowKey', deleteRow);
+	req.tableService.deleteEntity(tableName, entityDescriptor, function (error, entity, response) {
+		send.errorElse(res, error, function () {
+			send.content(res, response, 'response');
+		});
+	});
+}
