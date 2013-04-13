@@ -19,13 +19,14 @@ var   send = require('./send')
     , TableQuery = azure.TableQuery;
 
 module.exports = function queryTable (req, res, next) {
-	var top = req.query.top || 12;
+	var top = req.query.top;
 
 	var query = TableQuery
     		.select()
-    		.from(req.params.tableName)
-    		.top(top);
-
+    		.from(req.params.tableName);
+	if (top) {
+		query = query.top(top);
+	}
     if (req.query.nextRowKey && req.query.nextPartitionKey) {
     	query = query.whereNextKeys(req.query.nextPartitionKey, req.query.nextRowKey);
     }

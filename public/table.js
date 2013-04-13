@@ -20,6 +20,7 @@
 
   // Page state
   var selectedRows = {};
+  var maxResults = 10;
   
   // Page data
   var currentPageData = undefined;
@@ -98,14 +99,14 @@
 
   function sendRowDelete(tableName, partitionKey, rowKey, callback) {
     callback = callback || emptyCallback;
-    var data = getAjaxCredentials();
+    var data = getStandardAjaxData();
+    
+    // BUG: For some reason jQuery DELETE/POST does not send any query string. Was leading to 403s.
     var url = "/json/table/" + encodeURIComponent(tableName) + 
         "/" + encodeURIComponent(partitionKey) + 
-        "/" + encodeURIComponent(rowKey);
-    if (data.key) {
-      // BUG: For some reason jQuery DELETE/POST does not send any query string. Was leading to 403s.
-      url += "?account=" + encodeURIComponent(data.account) + "&key=" + encodeURIComponent(data.key);
-    }
+        "/" + encodeURIComponent(rowKey)
+        + getStandardAjaxDataQueryString();
+    
     $.ajax({
       type: 'DELETE',
       url: url,
@@ -479,7 +480,7 @@
   function loadTable(tableName, page, continuation) {
     currentTableName = tableName;
 
-    var data = getAjaxCredentials() || {};
+    var data = getStandardAjaxData();
     if (continuation) {
       data.nextRowKey = continuation.nextRowKey;
       data.nextPartitionKey = continuation.nextPartitionKey;
@@ -496,17 +497,43 @@
   	});
   }
 
-  function getAjaxCredentials() {
+  function getStandardAjaxData() {
     return {
       account: storageAccount,
-      key: storageKey
+      key: storageKey,
+      top: maxResults
     };
+  }
+
+  function getStandardAjaxDataQueryString() {
+    var qs = '';
+    var c = 0;
+    var data = getStandardAjaxData();
+    if (data.account && !data.key) {
+      // Server has the credentials. Special case.
+      delete data.account;
+    }
+    for (var d in data) {
+      if (data[d]) {
+        if (c == 0) {
+          qs = '?';
+        } else {
+          qs += '&';
+        }
+        qs += d;
+        qs += '=';
+        qs += encodeURIComponent(data[d]);
+
+        ++c;
+      }
+    }
+    return qs;
   }
 
   var loadTablesList = function () {
     $.ajax({ 
     	url: "/json/table",
-      data: getAjaxCredentials(),
+      data: getStandardAjaxData(),
     	success: function (data) {
         showErrorElse(data, function () {
           $('#results').show();
@@ -562,5 +589,14 @@
   // 4. Hook up events to buttons.
   $('#delete').click(deleteClicked);
   $('.brand').click(logoConfirm);
+
+  // 5. Calculate a good starting # of results to return vs the constant.
+  var height = $(document).height();
+  if (height > 800) {
+    height -= 375;
+    height /= 45;
+    height = Math.round(height);
+    maxResults = height;
+  }
 
 }(window.jQuery)
