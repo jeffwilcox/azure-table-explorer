@@ -544,6 +544,8 @@
       data: getAjaxCredentials(),
     	success: function (data) {
         showErrorElse(data, function () {
+          $('#results').show();
+
           dr = data.result;
           if (dr.name) {
             storageAccount = dr.name;
