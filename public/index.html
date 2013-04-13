@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <title>Windows Azure Table Service Explorer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="An easy application for exploring tables in the storage account of your Windows Azure subscription.">
-    <meta name="author" content="Jeff Wilcox">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="An easy application for exploring tables in your Windows Azure storage account."/>
+    <meta name="author" content="Jeff Wilcox"/>
 
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="css/azureopensource.css" rel="stylesheet">
+    <link href="//az414997.vo.msecnd.net/waz/table/bootstrap.min.css" rel="stylesheet"/>
+    <link href="//az414997.vo.msecnd.net/waz/table/bootstrap-responsive.min.css" rel="stylesheet"/>
+    
+    <link href="table.css" rel="stylesheet"/>
 
-    <link rel="shortcut icon" href="//az83882.vo.msecnd.net/favicon.ico">
+    <link rel="shortcut icon" href="//az83882.vo.msecnd.net/favicon.ico"/>
   </head>
 
   <body>
@@ -29,13 +30,16 @@
             <span class="icon-bar"></span>
           </button>
           <a class="brand" style="padding:15px 15px 5px 15px;margin-top:-5px" href="//www.windowsazure.com/"><img 
-              src="azure/windowsazurelogo.png" style="width:218px;height:35px;border:0px"
+              src="//az414997.vo.msecnd.net/waz/table/windowsazurelogo.png" style="width:218px;height:35px;border:0px"
               alt="Windows Azure" title="Windows Azure" /></a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="index.html">Table Service Explorer</a></li>
+              <li id="liDelete" style="display: none"><a href="#" id="delete">Delete</a></li>
             </ul>
           </div><!--/.nav-collapse -->
+          <div class="nav pull-right">
+            <li><a href="index.html">Table Service Explorer</a></li>
+          </div>
         </div>
       </div>
     </div>
@@ -87,11 +91,14 @@
       <!-- main page content -->
       <div class="row">
         <div class="span9" id="results">
+          <h2>Get started.</h2>
+          <p>Please select a table on the side to get started.</p>
         </div>
 
         <div class="span3">
           <h1 id="accountName"></h1>
           <div id="tableList"></div>
+          <div id="rowDetails"></div>
         </div>
       </div>
 
@@ -107,7 +114,12 @@
           <a href="https://github.com/windowsazure/">GitHub</a>
         </div>
 
-        <p><small><a href="https://github.com/jeffwilcox/azure-table-explorer">Source of this app</a></small></p>
+        <p><small><a href="https://github.com/jeffwilcox/azure-table-explorer">Source of this app</a><br />
+          Powered by: <a href="https://github.com/WindowsAzure/azure-sdk-for-node">Windows Azure SDK for Node.js</a>, 
+                      <a href="http://twitter.github.io/bootstrap">Twitter Bootstrap</a>, 
+                      <a href="http://jquery.com/">jQuery</a>, 
+                      <a href="http://momentjs.com/">moment.js</a>
+        </small></p>
 
         <!--
         <p><small>
@@ -121,9 +133,10 @@
     </div> <!-- /container -->
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
 
-    <script src="js/app.js"></script>
-
+    <script src="//az414997.vo.msecnd.net/waz/table/bootstrap.min.js"></script>
+    <script src="//az414997.vo.msecnd.net/waz/table/moment.js"></script>
+    
+    <script src="table.js"></script>
   </body>
 </html>
