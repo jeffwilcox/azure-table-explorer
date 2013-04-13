@@ -70,10 +70,17 @@
   }
 
   function showProgress() {
-
+    var p = $('#pleaseWait');
+    if (p) {
+      p.show();
+    }
   }
 
   function hideProgress() {
+    var p = $('#pleaseWait');
+    if (p) {
+      p.hide();
+    }
   }
 
   function logoConfirm() {
@@ -91,17 +98,22 @@
 
   function sendRowDelete(tableName, partitionKey, rowKey, callback) {
     callback = callback || emptyCallback;
-    var data = getAjaxCredentials() || {};
-    alert(JSON.stringify(data));
+    var data = getAjaxCredentials();
+    var url = "/json/table/" + encodeURIComponent(tableName) + 
+        "/" + encodeURIComponent(partitionKey) + 
+        "/" + encodeURIComponent(rowKey);
+    if (data.key) {
+      // BUG: For some reason jQuery DELETE/POST does not send any query string. Was leading to 403s.
+      url += "?account=" + encodeURIComponent(data.account) + "&key=" + encodeURIComponent(data.key);
+    }
     $.ajax({
       type: 'DELETE',
-      url: "/json/table/" + tableName + "/" + partitionKey + "/" + rowKey,
-      data: data,
+      url: url,
+      // data: data,
       success: function (data) {
         showErrorElse(data, callback);
       }
     });
-    // TODO: Note that the name and partition key are not well escaped. Should fix this.
   }
 
   function getSelectedRows() {
@@ -138,8 +150,6 @@
     } else {
       var subject = 'Error';
       var text = 'Something went wrong with the dynamic request.';
-
-      alert(JSON.stringify(json));
 
       showError(subject, text);
     }
@@ -382,7 +392,11 @@
       html.push('' + (end-1));
       html.push('" href="#">&rarr;</a></li>');
 
-      html.push('</ul></div>');
+      html.push('</ul>');
+
+      html.push('<div class="pull-right" id="pleaseWait" style="display: none"><p><small>Please wait...</small></p></div>');
+
+      html.push('</div>');
 
       // to string
       $('#results').html(html.join(''));
@@ -412,19 +426,11 @@
 
           rowMaster.click(function () {
             var isExpanded = (selectedRows[i] === true);
-
-            /* var tr_details = $('#tbldetail' + i);
-            var td_details = $('#tbldetailtd' + i); */
             var checkbox = $('#tblchecked' + i);
 
-            // tr_details.css('border-top', isExpanded ? '1px solid #ddd' : 0);
-
             if (isExpanded) {
-
-              // tr_details.hide();
               rowDetails.hide();
               rowMaster.removeClass('master-row-selected');
-
             } else {
               var h = [];
               rowMaster.addClass('master-row-selected');
@@ -455,40 +461,6 @@
 
               h.push('</small></li>')
 
-              /*
-              h.push('<div class="control-group">');
-              h.push('<label class="control-label" for="link">Link</label>');
-              h.push('<div class="controls">');
-              h.push('<input type="text" id="link" value="' + row._.link + '" />');
-              h.push('</div>');
-              h.push('</div>');
-
-              h.push('<div class="control-group">');
-              h.push('<label class="control-label" for="updated">Updated</label>');
-              h.push('<div class="controls">');
-              h.push('<p>' + row._.updated + '</p>');
-              h.push('</div>');
-              h.push('</div>');
-
-              h.push('<div class="control-group">');
-              h.push('<label class="control-label" for="etag">ETag</label>');
-              h.push('<div class="controls">');
-              h.push('<input type="text" id="etag" value="' + row._.etag + '" />');
-              h.push('</div>');
-              h.push('</div>');
-              */
-
-              /*
-              h.push('<p>');
-              h.push('<pre>');
-              h.push(JSON.stringify(row, null, 2));
-              h.push('</pre>');
-              h.push('</p>');
-              */
-
-              //td_details.html(h.join(''));
-              //tr_details.show();
-
               rowDetails.html(h.join(''));
               rowDetails.show();
             }
@@ -499,12 +471,9 @@
           });
         })(i);
       }
-
     } else {
       $('#results').html('<h2>Clean slate.</h2><p>There are no rows in the ' + tableName + ' table.');
     }
-
-    // alert(JSON.stringify(table));
   }
 
   function loadTable(tableName, page, continuation) {
@@ -528,14 +497,10 @@
   }
 
   function getAjaxCredentials() {
-    if (storageAccount && storageKey) {
-      return {
-        account: storageAccount,
-        key: storageKey
-      };
-    } else {
-      return undefined;
-    }
+    return {
+      account: storageAccount,
+      key: storageKey
+    };
   }
 
   var loadTablesList = function () {
