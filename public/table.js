@@ -499,7 +499,7 @@
 
   function getStandardAjaxData() {
     return {
-      account: storageAccount,
+      account: storageKey ? storageAccount : undefined,
       key: storageKey,
       top: maxResults
     };
@@ -509,10 +509,6 @@
     var qs = '';
     var c = 0;
     var data = getStandardAjaxData();
-    if (data.account && !data.key) {
-      // Server has the credentials. Special case.
-      delete data.account;
-    }
     for (var d in data) {
       if (data[d]) {
         if (c == 0) {
