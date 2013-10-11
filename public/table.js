@@ -336,7 +336,7 @@
       html.push('</table>');
 
       // Pagination
-      var hasContinuation = table.continuation.nextRowKey && table.continuation.nextPartitionKey;
+      var hasContinuation = table.continuation && table.continuation.nextRowKey && table.continuation.nextPartitionKey;
 
       pagingKeys[page] = table.continuation;
 
